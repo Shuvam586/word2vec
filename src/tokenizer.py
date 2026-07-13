@@ -1,49 +1,26 @@
+import re
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DATA_PATH = PROJECT_ROOT / "data" / "tiny.txt"
 
-file = "data/tiny"
-
-with open(file+".txt", "r") as f:
-    words = f.read().split()
-
-words_set = set(words)
-
-num = 0
-min_count = 3
-words_dict = {}
-ids_dict = {}
-counts_dict = {}
-
-for w in list(words_set):
-    wc = words.count(w)
-    if wc >= min_count:
-        words_dict[w] = num
-        ids_dict[num] = w
-        counts_dict[w] = wc
-        num += 1
-
-def word_to_id(word: str):
-    try:
-        return words_dict[word]
-    except:
-        return -1
+def read_corpus(file_path: str) -> str:
+    DATA_PATH = PROJECT_ROOT / "data" / (file_path+'.txt')
     
-def id_to_word(id: int):
-    try:
-        return ids_dict[id]
-    except:
-        return "-na-"
+    with open(DATA_PATH, "r") as f:
+        text = f.read()
 
-def counts(word: str):
-    try:
-        return counts_dict[word]
-    except:
-        return 0
+    return text
 
-def corpus_ids(sentence: list):
-    ids = []
-    for s in sentence.split():
-        ids.append(word_to_id(s))
-    return ids
+def tokenize(text: str, lowercase = True) -> list:
+    text = text.replace('\n', ' ')
+    text = re.sub(r'[^a-zA-Z\s]', '', text)
+
+    if lowercase:
+        text = text.lower()
+    
+    tokens = list(text.split(" "))
+    
+    return tokens
+
+def load_and_tokenize(file_path: str, lowercase = True) -> list:
+    return tokenize(read_corpus(file_path), lowercase)

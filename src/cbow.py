@@ -36,7 +36,18 @@ class CBOW:
         dscores = probs.copy()
         dscores[target_id] -= 1
 
-        scores = self.W_out @ h
-
+        # these 2 lines are of same rank??
         dW_out = np.outer(dscores, h)
-        dh = self.W_out @ h
+        dh = self.W_out.T @ dscores
+
+        dcontext = dh / len(context_ids)
+
+        # updating W_out
+        self.W_out -= learning_rate*dW_out
+
+        # updating W_in
+        np.add.at(
+            self.W_in,
+            context_ids,
+            -learning_rate * dcontext
+        )
