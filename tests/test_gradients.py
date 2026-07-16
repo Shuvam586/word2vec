@@ -40,6 +40,8 @@ dW_out = model.backward(
     learning_rate=0.001
 )
 
+print("this test will error out cause model.backward() doesn't return anything.")
+
 analytical_grad = dW_out[2][1]
 
 print(f"Numerical Grad: {numerical_grad}\nAnalytical Grad: {analytical_grad}")

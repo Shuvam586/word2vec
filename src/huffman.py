@@ -22,10 +22,8 @@ def build_huffman_tree(word_counts: dict) -> HuffmanNode:
         nodes.append(HuffmanNode(
             freq = word_counts[word],
             data = word,
-            node_id = id
+            node_id = None
         ))
-
-        id += 1
     
     while (len(nodes)>1):
         nodes.sort()
@@ -36,7 +34,7 @@ def build_huffman_tree(word_counts: dict) -> HuffmanNode:
     
     return nodes[0]
 
-def generate_codes(root: HuffmanNode) -> dict:
+def generate_codes(root: HuffmanNode, word_to_id: dict) -> dict:
     queue = [["0", root.left], ["1", root.right]]
 
     d = {}
@@ -44,10 +42,27 @@ def generate_codes(root: HuffmanNode) -> dict:
     while (len(queue)!=0):
         curr_item_path, curr_item = queue.pop(0)
         if (curr_item.data):
-            d[curr_item.data] = [int(i) for i in list(curr_item_path)]
+            d[word_to_id[curr_item.data]] = [int(i) for i in list(curr_item_path)]
             # print(curr_item.data, [int(i) for i in list(curr_item_path)])
         else:
             queue.extend([[curr_item_path+"0", curr_item.left], [curr_item_path+"1", curr_item.right]])
+
+    # print(d)
+
+    return d
+
+def generate_paths(root:HuffmanNode, word_to_id: dict) -> dict:
+    queue = [[[root.node_id], root.left], [[root.node_id], root.right]]
+
+    d = {}
+
+    while (len(queue)!=0):
+        curr_item_path, curr_item = queue.pop(0)
+        if (curr_item.data):
+            d[word_to_id[curr_item.data]] = curr_item_path
+            # print(curr_item.data, [int(i) for i in list(curr_item_path)])
+        else:
+            queue.extend([[curr_item_path+[curr_item.node_id], curr_item.left], [curr_item_path+[curr_item.node_id], curr_item.right]])
 
     # print(d)
 

@@ -1,11 +1,11 @@
 import numpy as np
-import src.cbow as cbow
 import src.vocab as vocab
 import src.analogy as analogy
+import src.cbow_hs as cbow_hs
+import src.huffman as huffman
 import src.dataset as dataset
 import src.tokenizer as tokenizer
 import src.similarity as similarity
-import src.huffman as huffman
 
 corpus_size = input("[tiny, small, medium, raw]: ")
 corpus_presets = ['medium', 'raw', 'small', 'tiny']
@@ -17,14 +17,21 @@ else:
     
     word_to_id, id_to_word, word_counts, corpus_ids = vocab.build_vocab(tokens)
 
-    # root = huffman.build_huffman_tree(word_counts)
-    # huffman.generate_codes(root)
+    root = huffman.build_huffman_tree(word_counts)
+    word_to_code, word_to_path = huffman.generate_codes(root, word_to_id), huffman.generate_paths(root, word_to_id)
 
     examples = dataset.generate_cbow_examples(corpus_ids, window_size=2)
 
-    model = cbow.CBOW(
+    # model = cbow.CBOW(
+    #     vocab_size=len(word_to_id),
+    #     embedding_dim=50
+    # )
+
+    model = cbow_hs.CBOW_HS(
         vocab_size=len(word_to_id),
-        embedding_dim=50
+        embedding_dim=50,
+        word_to_code=word_to_code,
+        word_to_path=word_to_path
     )
 
     epochs = int(input("epochs: "))
@@ -45,7 +52,7 @@ else:
 
             modified_lr = learning_rate * (1 - progress)
 
-            h, probs = model.forward(context)
+            h, probs = model.forward(context, target)
 
             loss = model.loss(probs, target)
 
