@@ -1,7 +1,7 @@
 import numpy as np
 import src.hierarchical_softmax as hs
 
-class CBOW_HS:
+class Skipgram_HS:
     def __init__(self, vocab_size, embedding_dim, word_to_code, word_to_path):
         self.vocab_size = vocab_size
         self.embedding_dim = embedding_dim
@@ -18,9 +18,8 @@ class CBOW_HS:
             word_to_path=word_to_path
         )
     
-    def forward(self, context_ids, target_id):
-        context_vectors = self.W_in[context_ids]
-        h = np.mean(context_vectors, axis=0)
+    def forward(self, center_id, target_id):
+        h = self.W_in[center_id]
 
         scores, probs = self.hs.forward(
             h,
@@ -35,7 +34,7 @@ class CBOW_HS:
             target_id=target_id
         )
 
-    def backward(self, context_ids, target_id, h, probs, learning_rate):
+    def backward(self, center_id, target_id, h, probs, learning_rate):
         dh = self.hs.backward(
             h=h,
             target_id=target_id,
@@ -43,10 +42,4 @@ class CBOW_HS:
             learning_rate=learning_rate
         )
 
-        dcontext = dh / len(context_ids)
-
-        np.add.at(
-            self.W_in,
-            context_ids,
-            -learning_rate * dcontext
-        )
+        self.W_in[center_id] -= learning_rate * dh

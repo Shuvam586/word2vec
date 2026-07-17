@@ -10,6 +10,9 @@ This paper focuses on:
 3. designing models which give embeddings where linear relationships are preserved:
 > Queen = King - Man + Woman
 
+## Dataset
+
+consists of `tiny.txt`, `small.txt`, `medium.txt` and `raw.txt` in `/data`. inital 3 files are simply slices of `raw.txt`.
 
 ## Preliminary CBOW Model
 
@@ -42,3 +45,25 @@ python3 -m tests.<test_name>
 ## analogy
 
 `analogy()` from `analogy.py` finds `x` where `a : b :: c : x` and `a`, `b` and `c` are known words.
+
+## CBOW Model using Hierarchical Softmax
+
+What is hierarchical softmax?
+> traditional softmax computes per word probabilities by performing dot products of millions of word vectors by multiplying `W_out` with `h` (mean vector of context words). hierarchical softmax arranges words in a huffman tree and then each internal node has a weight vector, which produces `p`, which is probability of the model choosing to go to the right node. 
+
+This converts a multi-class classification problem into a series of binary classification problems.
+
+## Skipgram Model
+
+very similar intuitively to CBOW architecture. predicts multiple possible words from a single word compared to prediciting a single missing word from multiple context words.
+
+## Random Skipgram Window
+
+> `R ~ Uniform(1, C)`
+
+This is supposed to perform better because words closer to the target are trained more to guess that specific word. Intuitively, words closer to the target contribute significantly more compared to the ones `C-1` words away.
+
+## TO DO
+
+- A small utils.py or model_io.py containing save_model(...) load_model(...) using pickle or np.savez.
+- Command-line arguments: Instead of editing source code every run, `python train_cbow.py --epochs 20 --lr 0.05 --window 5` using argparse.
