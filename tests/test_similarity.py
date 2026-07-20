@@ -1,7 +1,7 @@
-from train_skipgram_hs import train_model
+import src.model_io as model_io
 import src.similarity as similarity
 
-model, word_to_id, id_to_word = train_model("tiny", 30, 0.1)
+model, word_to_id, id_to_word = model_io.load_model(input("model name: "))
 
 while True:
     word = input("word: ")

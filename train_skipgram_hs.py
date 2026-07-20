@@ -1,17 +1,45 @@
+import argparse
 import numpy as np
 import src.vocab as vocab
 import src.analogy as analogy
 import src.huffman as huffman
 import src.dataset as dataset
+import src.model_io as model_io
 import src.tokenizer as tokenizer
 import src.similarity as similarity
 import src.skipgram_hs as skipgram_hs
 
-def train_model(corpus_size, epochs = 30, learning_rate = 0.1):
+parser = argparse.ArgumentParser(
+    description="cbow hs"
+)
+
+parser.add_argument(
+    "--epochs",
+    type=int,
+    default=30
+)
+
+parser.add_argument(
+    "--lr",
+    type=float,
+    default=0.1
+)
+
+parser.add_argument(
+    "--size",
+    type=str,
+    default='tiny.txt'
+)
+
+args = parser.parse_args()
+
+def train_model(corpus_size, epochs, learning_rate):
     corpus_presets = ['medium', 'raw', 'small', 'tiny']
     if corpus_size not in corpus_presets:
         return f'{corpus_size} doesnt exist lmao'
     else:
+        print(f"cbow_hs:\nepochs: {epochs}  |  lr: {learning_rate}  |  corpus_size: {corpus_size}")
+        
         tokens = tokenizer.load_and_tokenize(corpus_size, lowercase=True)
         
         word_to_id, id_to_word, word_counts, corpus_ids = vocab.build_vocab(tokens)
@@ -42,6 +70,9 @@ def train_model(corpus_size, epochs = 30, learning_rate = 0.1):
 
             modified_lr = learning_rate
 
+            examples_len = len(examples)
+            examples_by10 = int(len(examples)/3)
+
             for center, target in examples:
 
                 progress = (epoch*len(examples)+example_index)/(epochs*len(examples))
@@ -62,12 +93,28 @@ def train_model(corpus_size, epochs = 30, learning_rate = 0.1):
 
                 example_index += 1
                 total_loss += loss
+
+                if (example_index%examples_by10==0):
+                    print(f"example {((example_index / examples_len)*100):.2f}%")
             
             print(f"epoch {epoch+1}/{epochs} | loss: {total_loss}")
         
+        model_name = f"skipgram_hs_{corpus_size}_{epochs}_{str(learning_rate).replace(".", "dot")}"
+        
+        model_io.save_model(
+            name=model_name,
+            model=model,
+            word_to_id=word_to_id,
+            id_to_word=id_to_word
+        )
+
         return model, word_to_id, id_to_word
 
 
 # corpus_size = input("[tiny, small, medium, raw]: ")
 
-# train_model(corpus_size)
+train_model(
+    corpus_size=args.size,
+    epochs=args.epochs,
+    learning_rate=args.lr
+)

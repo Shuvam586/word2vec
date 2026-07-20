@@ -12,7 +12,14 @@ This paper focuses on:
 
 ## Dataset
 
-consists of `tiny.txt`, `small.txt`, `medium.txt` and `raw.txt` in `/data`. inital 3 files are simply slices of `raw.txt`.
+- I have used [text8](https://www.kaggle.com/datasets/gupta24789/text8-word-embedding). download and place the txt file in `/data`.
+- use `/scripts/split_dataset.py` to produce `tiny.txt`, `small.txt` and `medium.txt` from `raw.txt`.
+
+## Setup & Usage
+
+1. Install the [dataset](#dataset) and run `/scripts/split_dataset.py`.
+2. Train a model using `train_cbow_hs.py` or `train_skipgram_hs.py`. pass command-line args for `epochs`, `size` and `lr`.
+3. Explore the model's learnings using `test_similarity.py` and `test_analogy.py`. 
 
 ## Preliminary CBOW Model
 
@@ -63,7 +70,7 @@ very similar intuitively to CBOW architecture. predicts multiple possible words 
 
 This is supposed to perform better because words closer to the target are trained more to guess that specific word. Intuitively, words closer to the target contribute significantly more compared to the ones `C-1` words away.
 
-## TO DO
+## Quality of Life Improvements:
 
-- A small utils.py or model_io.py containing save_model(...) load_model(...) using pickle or np.savez.
-- Command-line arguments: Instead of editing source code every run, `python train_cbow.py --epochs 20 --lr 0.05 --window 5` using argparse.
+- `epoch`, `lr` and `corpus_size` arguments can be passed from the terminal; implemented using `argparse`.
+- `model_io.py` contains functions to save and load trained models.
